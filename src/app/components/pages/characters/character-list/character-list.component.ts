@@ -1,8 +1,10 @@
 import { Component, OnInit } from '@angular/core';
+import {ActivatedRoute, NavigationEnd, ParamMap, Router} from "@angular/router";
+import {take, filter} from "rxjs/operators";
+
 import {CharacterService} from "@shared/services/character.service";
-import {take} from "rxjs/operators";
 import {Character} from "@shared/interfaces/character.interface";
-import {ActivatedRoute, ParamMap} from "@angular/router";
+
 
 type RequestInfo = {
   next: string;
@@ -25,13 +27,24 @@ export class CharacterListComponent implements OnInit {
 
   constructor(
     private characterSvc: CharacterService,
-    private route:ActivatedRoute
-  ) {}
+    private route:ActivatedRoute,
+    private router: Router
+  ) {
+    this.onUrlChanged();
+  }
 
   ngOnInit(): void {
     this.getCharactersByQuery();
   }
 
+  private onUrlChanged(): void {
+    this.router.events.pipe(
+      filter((event) => event instanceof NavigationEnd)).subscribe(() => {
+        this.characters=[];
+        this.pageNum = 1;
+        this.getCharactersByQuery();
+      });
+  }
   private getCharactersByQuery():void{
       this.route.queryParams.pipe(take(1)).subscribe((params: ParamMap) => {
           console.log('Params ->', params);
