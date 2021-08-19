@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: smooth;
+}
+
 .container {
   margin-top: 4rem;
 }
@@ -7,6 +11,8 @@
   box-sizing: border-box;
   margin: 10px 0;
   background-color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
   max-width: 529px;
   transition: all 0.2s ease-in-out;
   &:hover {
@@ -24,5 +30,25 @@
 
   .card-inner {
     padding: 10px;
+  }
+}
+
+.no-hidden {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  visibility: visible;
+}
+
+.navbar-img {
+  max-width: 100px;
+  max-height: 100px;
+}
+
+@media(max-width: 570px) {
+  .card {
+    img {
+      opacity: 1;
+    }
   }
 }

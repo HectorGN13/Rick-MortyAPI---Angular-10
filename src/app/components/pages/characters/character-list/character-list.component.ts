@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, HostListener, Inject, OnInit} from '@angular/core';
 import {ActivatedRoute, NavigationEnd, ParamMap, Router} from "@angular/router";
+
+import {DOCUMENT} from "@angular/common";
 import {take, filter} from "rxjs/operators";
 
 import {CharacterService} from "@shared/services/character.service";
@@ -20,12 +22,14 @@ export class CharacterListComponent implements OnInit {
   info: RequestInfo = {
     next: null,
   };
+  showGoUpButton = false;
   private pageNum=1;
   private query:string;
   private hideScrollHeight = 200;
   private showScrollHeight = 500;
 
   constructor(
+    @Inject(DOCUMENT) private document:Document,
     private characterSvc: CharacterService,
     private route:ActivatedRoute,
     private router: Router
@@ -35,6 +39,27 @@ export class CharacterListComponent implements OnInit {
 
   ngOnInit(): void {
     this.getCharactersByQuery();
+  }
+
+  @HostListener('window:scroll', []) onWindowScroll():void {
+    const yOffSet = window.pageYOffset;
+    if((yOffSet || this.document.documentElement.scrollTop || this.document.body.scrollTop) > this.showScrollHeight ) {
+      this.showGoUpButton = true;
+    } else if (this.showGoUpButton && (yOffSet || this.document.documentElement.scrollTop || this.document.body.scrollTop) < this.hideScrollHeight) {
+      this.showGoUpButton = false;
+    }
+  }
+
+  onScrollDown(): void {
+    if(this.info.next){
+      this.pageNum++;
+      this.getDataFromService();
+    }
+  }
+
+  onScrollTop(): void {
+    this.document.body.scrollTop = 0;  //Safary
+    this.document.documentElement.scrollTop = 0; //others
   }
 
   private onUrlChanged(): void {
